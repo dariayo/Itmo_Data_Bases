@@ -1,0 +1,76 @@
+CREATE TYPE sex AS ENUM ('Мужчина','Женщина');
+CREATE TYPE actions AS ENUM (
+    'Объединяться в группы',
+    'Открывать компании',
+    'Использовать результаты'
+    );
+CREATE TYPE professions AS ENUM (
+    'Ученый',
+    'Врач',
+    'Инженер'
+    );
+CREATE TABLE work
+(
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(150) NOT NULL DEFAULT 'где-то',
+    coordinates POINT
+);
+CREATE TABLE people
+(
+    id              SERIAL PRIMARY KEY,
+    name            VARCHAR(50) NOT NULL,
+    current_work_id INT         NOT NULL REFERENCES work (id),
+    sex             sex         NOT NULL,
+    wish_id INT NOT NULL REFERENCES wish (id)
+);
+CREATE TABLE people_actions
+(
+    id       SERIAL PRIMARY KEY,
+    name     actions NOT NULL,
+    human_id INT     NOT NULL REFERENCES people (id)
+);
+CREATE TABLE profession
+(
+    id       SERIAL PRIMARY KEY,
+    human_id INT NOT NULL REFERENCES people (id),
+    name_of_profession professions NOT NULL
+);
+CREATE TABLE research
+(
+    id             SERIAL PRIMARY KEY,
+    name_of_research VARCHAR(50) NOT NULL,
+    availability_of_results BOOLEAN NOT NULL,
+    finance INT NOT NULL
+);
+CREATE TABLE wish
+(
+    id        SERIAL PRIMARY KEY,
+    wish_name VARCHAR(50) NOT NULL
+);
+CREATE TABLE firm
+(
+    id       SERIAL PRIMARY KEY,
+    human_id INT NOT NULL REFERENCES people (id),
+    firm_id  INT NOT NULL REFERENCES research (id),
+    count    INT NOT NULL,
+    date     DATE NOT NULL
+);
+INSERT INTO work(id, name, coordinates)
+VALUES (1, 'Национальная Академия', POINT(10, 40)),
+       (2, 'Владелец акций', POINT(20, 40));
+INSERT INTO people(id, name, current_work_id, sex,wish_id)
+VALUES (3, 'Джон', 1, 'Мужчина',11),
+       (4, 'Алекс', 2, 'Женщина',11);
+INSERT INTO people_actions(id, name, human_id)
+VALUES (5, 'Открывать компании', 3),
+       (6, 'Использовать результаты', 4),
+       (7, 'Объединяться в группы', 3);
+INSERT INTO profession(id, human_id,name_of_profession)
+VALUES (9, 3,'Ученый'),
+        (10, 4,'Ученый');
+INSERT INTO research(id, name_of_research,finance,availability_of_results)
+VALUES (11, 'Генетическое',100000,TRUE);
+INSERT INTO wish(id, wish_name)
+VALUES (12, 'Стать богатым');
+INSERT INTO firm(id, human_id, firm_id, count,date)
+VALUES (13, 3, 11, 64, '2022-12-13');
